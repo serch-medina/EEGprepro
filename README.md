@@ -1,3 +1,5 @@
+# EEGprepro
+Pipeline for EEG signal preprocesing using matlab and python. Desgined for Neuroscience Division of Institute of Celular Physiology (IFC - UNAM)
 # Organización
 En la carpeta de `data`, se colocan los archivos `.hdf5` y después de eso basta con darle en `OK` cada vez que salte la ventana para añadir eventos desde un canal. **No** hay que colocar nada en esos campos, basta con darle en `OK`. Posterior a eso el programa se encargará de exportar el resto de archivos requeridos por `extract_fdata`. Toma en cuenta que por la naturaleza de los datos de electroencefalograma (EEG), el preprocesamiento de esta primera etapa puede ser algo tardado. Ten paciencia y sólo monitorea que no surja ningún error. 
 **Nota:** Para correr los programas en python requieren que el intérprete global tenga instaldas las paquetería de `numpy`, `matplotlib` ,`pandas` y `scipy`.  
