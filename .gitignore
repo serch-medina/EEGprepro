@@ -44,8 +44,9 @@ codegen/
 eeglab2026/
 eeglab2026.0.0/
 
-## Carpeta del proyecto
+## Carpetas del proyecto y otros programas
 resources/
+__pycache__/
 
 # Ignorar carpetas de exportado de datos. Solo nos interesan los scripts
 datos_exportados_m/
