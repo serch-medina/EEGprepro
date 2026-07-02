@@ -1,0 +1,58 @@
+# Autosave files
+*.asv
+*.m~
+*.autosave
+*.slx.r*
+*.mdl.r*
+
+# Derived content-obscured files
+*.p
+
+# Compiled MEX files
+*.mex*
+
+# Packaged app and toolbox files
+*.mlappinstall
+*.mltbx
+
+# Deployable archives
+*.ctf
+
+# Generated helpsearch folders
+helpsearch*/
+
+# Code generation folders
+slprj/
+sccprj/
+codegen/
+
+# Cache files
+*.slxc
+
+# Cloud based storage dotfile
+.MATLABDriveTag
+
+# buildtool cache folder
+.buildtool/
+
+# SimBiology backup files
+*.sbproj.backup
+*.sbproj.bak
+
+# Carpeta de eeglab, para evitar problemas futuros. 
+# Cada quien debera configurar la version que quiera usar
+eeglab2026/
+eeglab2026.0.0/
+
+## Carpeta del proyecto
+resources/
+
+# Ignorar carpetas de exportado de datos. Solo nos interesan los scripts
+datos_exportados_m/
+datos_exportados_py/
+figuras/
+
+# Ignoramos los archivos de datos de senhal EEG
+data/*.hdf5
+#Ignoramos los notebooks
+*.ipynb
