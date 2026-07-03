@@ -1,16 +1,20 @@
-[ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab;
+% Parametros a definir para ejecutar el ICA
 fpath_loc = fullfile('locs_canales.ced');
-recortado = true; % indica si hemos generado un archivo con senhales recortadas
-if recortado
-    ptos_registro = 574480; % Van a cambiar si recortamos la actividad, hay que imprimir despues de recortar la actividad
-else
-    ptos_registro = 802951;
-end
-    nombre_sujeto = 'H13COM';
-[fpath_act fpath_evnt]= rec_path(nombre_sujeto, recortado);
+fpath_registros = fullfile('registros/','registro_preprocesamiento.txt');
+recortado = false; % indica si hemos generado un archivo con senhales recortadas
+nombre_sujeto = 'H13COM';
+
+% Extraccion de numero de puntos 
+ptos_registro = extraer_puntos(fpath_registros,nombre_sujeto,recortado);
+
+% Inicio de eeglab
+[ALLEEG, EEG, CURRENTSET, ALLCOM] = eeglab; 
+% extraccion de rutas de archivos de eventos y actividad
+[fpath_act, fpath_evnt]= rec_path(nombre_sujeto, recortado);
+% Cargado de datos del dataset en eeglab y ejecucion del ICA
 [ALLEEG EEG CURRENTSET ALLCOM] = cargar_datos_ICA(nombre_sujeto,fpath_act,fpath_evnt,fpath_loc,ptos_registro, ALLEEG,EEG,CURRENTSET,ALLCOM,NaN)
 eeglab redraw 
-EEG = pop_runica(EEG, 'icatype', 'fastica');
+EEG = pop_runica(EEG, 'icatype', 'fastica'); % ejecucion de ICA
 [ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
 eeglab redraw
 EEG = iclabel(EEG);

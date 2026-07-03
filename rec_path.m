@@ -1,7 +1,8 @@
-function [fpath_act fpath_evnt] = rec_path(nombre_sujeto, recortar)
-    % Funcion pensada para uso propio donde unicamente se le pasa el nombre
-    % del archivo e internamente reconstruye el nombre del resto de
-    % archivos. De tal forma, no hace falta escribir la ruta completa
+function [fpath_act, fpath_evnt] = rec_path(nombre_sujeto, recortar)
+    % Funcion para uso interno. Se le pasa el nombre
+    % del archivo e internamente reconstruye la ruta de los
+    % archivos de actividad y eventos exportados por python,
+    % de tal forma, no hace falta escribir la ruta completa
     arguments
         nombre_sujeto (1,:) char;
         recortar (1,1) = false;

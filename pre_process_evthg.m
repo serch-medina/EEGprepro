@@ -13,6 +13,6 @@ for i = 1:numel(files)
     exp_actividad(files(i).name,srcDir);
 end
 
-py.extraer_datos.extraer_datos(recortar=true) % Yo guarde en el registro_dexp... la info sobre la duracion de los datos
+py.extraer_datos.extraer_datos() % Yo guarde en el registro_dexp... la info sobre la duracion de los datos
 
 disp('¡Primer paso del preprocesamiento obliterado, finiquitado, machacado y pulverizado!');

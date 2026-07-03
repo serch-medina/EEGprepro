@@ -1,0 +1,3 @@
+# Ignoramos por defecto los archivos de datos 
+*.hdf5
+!.gitignore

@@ -46,14 +46,13 @@ eeglab2026.0.0/
 
 ## Carpetas del proyecto y otros programas
 resources/
-__pycache__/
+__pycache__/*
 
 # Ignorar carpetas de exportado de datos. Solo nos interesan los scripts
 datos_exportados_m/
 datos_exportados_py/
 figuras/
+resgistros/
 
-# Ignoramos los archivos de datos de senhal EEG
-data/*.hdf5
 #Ignoramos los notebooks
 *.ipynb

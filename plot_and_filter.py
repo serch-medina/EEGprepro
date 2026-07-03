@@ -34,15 +34,15 @@ def carga_archivo_eventos(nombre_sujeto: str) -> pd.DataFrame:
     return data
 
 # ! Aqui en modificar eventos debe exportarse el archivo de eventos
-def modificar_eventos(data: pd.DataFrame, ruta_registro: str) -> tuple[int, pd.DataFrame]:
-    """Filtra los eventos que corresponden a ensayos completos y elimina repeticiones de los ensayos 4 y 5; y exporta el archivo con los eventos modificados. 
+def modificar_eventos(data: pd.DataFrame, archivo_registro) -> tuple[int, pd.DataFrame]:
+    """Filtra los eventos que corresponden a ensayos completos y elimina repeticiones de los ensayos 4 y 5; y exporta el archivo con los eventos modificados. Adicionalmente guarda en un archivo de registro los ensayos que fueron eliminados. 
 
     Parametros
     ----------
     data : pd.DataFrame
         DataFrame original con los eventos.
-    ruta_registro : objeto tipo Path
-        Ruta que apunta al archivo de registro donde se guardaran los eventos incompletos pero registrados en la psicofisica. 
+    archivo_registro : file object
+        Archivo de registro donde se guardarán los eventos incompletos pero registrados en la psicofisica. 
 
     Regresa
     -------
@@ -57,7 +57,7 @@ def modificar_eventos(data: pd.DataFrame, ruta_registro: str) -> tuple[int, pd.D
     ensayos = 0
     ensayos_reales = 0
     posibles = np.zeros(8)
-    archivo_registro = open(ruta_registro, 'a', encoding='utf-8')
+
     for idx, trigger in enumerate(mi_array_ev):
     #   print(f"El valor de trigger es {trigger}")
       match trigger:
@@ -112,11 +112,6 @@ def modificar_eventos(data: pd.DataFrame, ruta_registro: str) -> tuple[int, pd.D
             # ! ver si hay que agregar aquí un 
             ensayos += 1
 
-          # la forma en la que desecha ensayos defectuosos es que si no encuentra el trigger 8, 
-          # no se guarda el ensayo. Y se sobreescriben los valores de 'posibles'. No asegura 
-          # desechar ensayos defectuosos si aparece el trigger 8.
-    archivo_registro.close()
-
     mis_triggeritos = np.int64(mis_triggers_verdaderos)
     # mis_triggeritos = mis_triggeritos.astype(int)
     # Al parecer hay una incompatibilidad entre el tipo de dato de numpy y el del pdframe
@@ -128,15 +123,17 @@ def modificar_eventos(data: pd.DataFrame, ruta_registro: str) -> tuple[int, pd.D
                                                                                     # del pdframe que coincidan entre triguertios y data
                                                                                     # Luego con loc se toma un subconjunto del pdframe y
                                                                                     # por ultimo se ordenan los eventos.
-    funcion_redondeo = lambda x: f"{float(x):.6f}" # funcion que se aplica a
+    # funcion_redondeo = lambda x: f"{float(x):.6f}" # funcion que se aplica a
                                                    # varios campos del dataset
-                                                   # para redondear sus valores
-    mis_eventos['type'] = mis_eventos['type'].astype(str)
+                                                   # para redondear sus valores. 
+                                                   # Aunque convierte a string
+                                                   # Cambiamos a metodo round(). 
+    mis_eventos['type'] = mis_eventos['type']
     mis_eventos = mis_eventos.drop(columns=['number'])
     # mis_eventos['position'] = mis_eventos['position'].apply(funcion_redondeo)
-    mis_eventos['latency'] = mis_eventos['latency'].apply(funcion_redondeo)
-    mis_eventos['urevent'] = mis_eventos['urevent'].apply(funcion_redondeo)
-    mis_eventos['duration'] = mis_eventos['duration'].apply(funcion_redondeo)
+    mis_eventos['latency'] = mis_eventos['latency'].round(6)
+    mis_eventos['urevent'] = mis_eventos['urevent'].round(6)
+    mis_eventos['duration'] = mis_eventos['duration'].round(6)
 
     return ensayos_reales, mis_eventos
 
@@ -212,8 +209,8 @@ def verif_duraciones(mis_eventos):
     path_registro_duraciones = Path(r'.\registros\registro_duraciones_preprocesamiento.txt') # Archivo de registro de procesamiento
     registro_duraciones = open(path_registro_duraciones, 'a', encoding='utf-8')
 
-    print(f"Antes del estímulo: {antesesti_seg} \n", file=registro_duraciones)
-    print(f"Después del estímulo: {despuesesti_seg} \n", file=registro_duraciones)
+    print(f"Antes del estímulo: {antesesti_seg}", file=registro_duraciones)
+    print(f"Después del estímulo: {despuesesti_seg}", file=registro_duraciones)
     registro_duraciones.close()
 
 def carga_archivo_acttiem(nombre_sujeto_tiempo, nombre_sujeto_actividad):
@@ -286,7 +283,7 @@ def cortar_tiempo_entre_ensayos(eventos,actividad,tresh=0.7):
     print(f'El vector cuyas entradas son los anchos de los intervalo a recortar es: {distancia_ajuste}')
     print("--------------------------------------------------------")
     print(f'Forma(shape) de la actividad: {actividad.shape}')
-    print(f'actividad[1]: {actividad[1]}')
+    # print(f'actividad[1]: {actividad[1]}')
     latencias8 = filtrado_tipo8["latency"].tolist()
     latencias1 = filtrado_tipo1["latency"].tolist()
     suma_acumulada = 0
@@ -468,21 +465,6 @@ def graficar_datos(sujeto,tiempo, actividad, electrodo, estado, nombreelect, yli
   fig.savefig(f'figuras/actividad_{estado}_{nombreelect}_{sujeto}.png', dpi=450, bbox_inches='tight')
                                   # bbox_inches='tight' recorta el espacio blanco
                                   # sobrante y evita que las etiquetas sean recortadas
-  # plt.show()
-
-
-  #Comentar las lineas de abajo
-  # plt.plot(tiempo, actividad[electrodo])
-  # plt.xlabel("Tiempo (s)")
-  # plt.ylabel("Amplitud")
-  # plt.title("Actividad del electrodo " + (electrodo if estado=='antes' else nombreelect) )
-  # plt.show()
-  # plt.plot(tiempo, np.mean( (actividad if estado=='antes' else actividad.T), axis=1))
-  # plt.ylabel("Amplitud")
-  # plt.xlabel("Tiempo (s)")
-  # plt.title("Promedio de actividad de todos los electrodos " + estado)
-  # plt.ylim(ylim)
-  # plt.show()
 
 def graficar_comparacion(sujeto, tiempo, actividad, senhalfiltrada, numelectrodo, electrodo, fs=250, order=4, lowcut = 0.5, highcut = 50):
     """Compara visualmente una señal original y su versión filtrada.
