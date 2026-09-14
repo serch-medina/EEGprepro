@@ -45,7 +45,6 @@ eeglab2026/
 eeglab2026.0.0/
 
 ## Carpetas del proyecto y otros programas
-resources/
 __pycache__/*
 
 # Ignorar carpetas de exportado de datos. Solo nos interesan los scripts
@@ -56,3 +55,6 @@ resgistros/
 
 #Ignoramos los notebooks
 *.ipynb
+
+#Ignoramos segmentados de momento
+segmentado/*
