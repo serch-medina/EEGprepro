@@ -34,7 +34,7 @@ def carga_archivo_eventos(nombre_sujeto: str) -> pd.DataFrame:
     return data
 
 # ! Aqui en modificar eventos debe exportarse el archivo de eventos
-def modificar_eventos(data: pd.DataFrame, archivo_registro) -> tuple[int, pd.DataFrame]:
+def modificar_eventos(data: pd.DataFrame,archivo_registro) -> tuple[int, pd.DataFrame]:
     """Filtra los eventos que corresponden a ensayos completos y elimina repeticiones de los ensayos 4 y 5; y exporta el archivo con los eventos modificados. Adicionalmente guarda en un archivo de registro los ensayos que fueron eliminados. 
 
     Parametros

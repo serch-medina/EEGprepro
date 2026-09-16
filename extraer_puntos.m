@@ -29,7 +29,7 @@ function ptos_registro = extraer_puntos(fpath, nombre_sujeto, recortado)
                                                 % extraer el numero de
                                                 % muestras.
     if ~isempty(cadena)
-         ptos_registro = str2double(ptos_celda{1}{1});
+        ptos_registro = str2double(ptos_celda{1}{1});
     else
         error('Error: cadena vacía, no se pudo recuperar el numero de puntos. Revisar si existe el sujeto')
 end

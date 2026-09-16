@@ -1,8 +1,8 @@
 % Parametros a definir para ejecutar el ICA
 fpath_loc = fullfile('locs_canales.ced');
-fpath_registros = fullfile('registros/','registro_preprocesamiento.txt');
+nombre_sujeto = input('Ingrese el nombre del sujeto para realizarle el ICA\n','s');
+fpath_registros = fullfile('registros/',[nombre_sujeto '_registro_preprocesamiento.txt']);
 recortado = false; % indica si hemos generado un archivo con senhales recortadas
-nombre_sujeto = 'H13COM';
 
 % Extraccion de numero de puntos 
 ptos_registro = extraer_puntos(fpath_registros,nombre_sujeto,recortado);
@@ -15,10 +15,13 @@ ptos_registro = extraer_puntos(fpath_registros,nombre_sujeto,recortado);
 [ALLEEG EEG CURRENTSET ALLCOM] = cargar_datos_ICA(nombre_sujeto,fpath_act,fpath_evnt,fpath_loc,ptos_registro, ALLEEG,EEG,CURRENTSET,ALLCOM,NaN)
 eeglab redraw 
 EEG = pop_runica(EEG, 'icatype', 'fastica'); % ejecucion de ICA
+noc = size(EEG.icawinv, 2); % noc: number of ica components
 [ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
 eeglab redraw
 EEG = iclabel(EEG);
 EEG = pop_iclabel(EEG, 'default');
 [ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
-pop_viewprops( EEG, 0, [1:32], {'freqrange', [2 80]}, {}, 1, 'ICLabel') 
+% - El segundo argumento es si se usan componentes (=0) o canales (=1) 
+% - El ultimo argumento es el gestor de componentes que se usara
+pop_viewprops(EEG, 0, [1:noc], {'freqrange', [2 80]}, {}, 1, 'ICLabel') 
 eeglab redraw

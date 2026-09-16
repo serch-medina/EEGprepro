@@ -13,6 +13,14 @@ for i = 1:numel(files)
     exp_actividad(files(i).name,srcDir);
 end
 
-py.extraer_datos.extraer_datos() % Yo guarde en el registro_dexp... la info sobre la duracion de los datos
+% IMPORTANTE ! : Forzar verificacion, fuerza a todos los archivos dentro de
+% la carpeta datos_exportados_m/eventos_exportados a ser reprocesados por
+% python y con ello sobreescribe los registros generados. 
+% POR ESO QUEDA POR IMPLEMENTAR, UNA OPCION QUE PERMITA REPROCESAR SOLO UN
+% ARCHIVO O ARCHIVOS, EN ESPECIFICO.
+
+py.extraer_datos.extraer_datos(false, true, false) % Yo guarde en el registro_dexp... la info sobre la duracion de los datos
 
 disp('¡Primer paso del preprocesamiento obliterado, finiquitado, machacado y pulverizado!');
+
+% clear ?

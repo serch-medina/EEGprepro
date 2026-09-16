@@ -16,10 +16,10 @@ eeglab redraw
 
 fs = EEG.srate;
 
-% --- PARÁMETROS DE CONFIGURACIÓN CONFIGURABLES ---
+% --- PARÁMETROS DE CONFIGURACIÓN CONFIGURABLES (CONFIGURACIONABLES) ---
 
 % Umbral de canales simultáneos para etiquetar un evento como ruidoso.
-min_channels_noisy = 8;
+min_channels_noisy = floor(EEG.nbchan / 2) - 1;
 
 % -- Parametros estadisticos (z-score) --
 z_MAFD_f = 3; % f: factor
@@ -57,7 +57,7 @@ end
 fs = EEG.srate; % Frecuencia de muestreo (250 Hz)
 noise_matrix = false(num_channels, num_of_epochs); % Va a ser de 32 x 198 o 160. Cada ventana es la duracion de un ensayo.
 
-fprintf('Iniciando detección de ruido mediante algoritmo de Tamburro et al. en %d canales y en %d ensayos \n', num_channels, num_of_epochs); 
+fprintf('Iniciando detección de ruido mediante algoritmo de Tamburro et al. (modificado) en %d canales y en %d ensayos \n', num_channels, num_of_epochs); 
 
 % Primero definirlo una vez e ir guardando... problema, en tal caso,
 % podriamos tomar datos que no corresponden, mejor volver a ceros cada itereacion. 
