@@ -1,5 +1,6 @@
 import re # importado de modulo para busqueda por expresiones regulares
 import csv
+import os
 import pandas as pd
 from plot_and_filter import *
 from pathlib import Path
@@ -16,34 +17,39 @@ def extraer_datos(recortar = False, forzar_procesamiento = False, verificar_dura
     verificar_duraciones : booleano
         Cuando se encuentra activo verifica las duraciones de los eventos procesados
     """
+    # Obtiene la ruta padre es decir, en donde se encuentra este script.
+    src_padre = Path(__file__).resolve().parent
 
     # Crea los directorios por primera vez. Las funciones que exportan tambien intentan realizar esta accion
-    ruta_filtrados = Path(r'.\datos_exportados_py\actividad_filtrada')
-    ruta_modificados = Path(r'.\datos_exportados_py\eventos_modificados')
+    ruta_filtrados = src_padre / 'datos_exportados_py' / 'actividad_filtrada'
+    ruta_modificados = src_padre / 'datos_exportados_py' / 'eventos_modificados'
     if not ruta_filtrados.is_dir() or not ruta_modificados.is_dir():
         os.makedirs(ruta_filtrados)
         os.makedirs(ruta_modificados)
     # Crea el directorio donde se exportaran los ensayos a eliminar en formato .csv
-    ruta_csv = Path(r'.\ensayos_por_eliminar')
+    ruta_csv = src_padre / 'ensayos_por_eliminar'
     if not ruta_csv.is_dir():
         os.makedirs(ruta_csv)
 
-    src_dir = Path(r'.\datos_exportados_m\eventos_exportados') # Carpeta desde donde se cargan los archivos de eventos
+    src_dir = src_padre / 'datos_exportados_m' / 'eventos_exportados' # Carpeta desde donde se cargan los archivos de eventos
+
     print(f'Leyendo archivos de la carpeta: {src_dir}')
     files = sorted(src_dir.glob('*.txt')) # Carga todos los archivos de texto en la carpeta, ordenados alfabéticamente
     print(f'Número de archivos encontrados: {len(files)}')
     print(f'Mostrando archivos: {files}')
 
-    os.makedirs(r'.\registros', exist_ok=True) # Crea la carpeta de registros si no existe
+    os.makedirs(src_padre / 'registros', exist_ok=True) # Crea la carpeta de registros si no existe
         # ! Se configura la salida de los comandos print para que se escriba automaticamente en el archivo de registro
 
     for file in files:
         sbjct_name_mod = file.stem # Obtiene el nombre del sujeto sin la extensión
         sbjct_name = sbjct_name_mod.replace("_eventos","") # Extrae el nombre del sujeto del experimento
 
-        archivo_exportado = Path(r'.\datos_exportados_py\actividad_filtrada') / f'{sbjct_name}_actividad_filtrada' # Ruta del archivo que se guardará
-        archivo_exportado_rec = Path(r'.\datos_exportados_py\actividad_filtrada') / f'{sbjct_name}_actividad_filtrada_rec'
-        path_archivo_registro = Path(rf'.\registros\{sbjct_name}_registro_preprocesamiento.txt') # Archivo de registro de procesamiento
+        # Construye las rutas independientemente del sistema operativo y del
+        # directorio desde el que se ejecute el script.
+        archivo_exportado = ruta_filtrados / f'{sbjct_name}_actividad_filtrada' # Ruta del archivo que se guardará
+        archivo_exportado_rec = ruta_filtrados / f'{sbjct_name}_actividad_filtrada_rec'
+        path_archivo_registro = src_padre / 'registros' / f'{sbjct_name}_registro_preprocesamiento.txt' # Archivo de registro de procesamiento
 
         """
          ! Verifica si el archivo de actividad existe, en cuyo caso ejecuta el resto de codigo, 

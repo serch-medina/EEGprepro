@@ -1,21 +1,33 @@
-function [EEG, eliminados, cancelado] = ...
-    revisar_epocas_ruidosas(EEG, noisy_events, sujeto) 
-% CAMBIAR POR EL NOMBRE QUE ES DE LA FUNCION 
-% TAMBIEN ACTUALIZAR EL
-% PIPELINE. ASI ESTA PARA
-% USAR LA OTRA FUNCIÓN Y PASARLE SU INFO QUE GENERE A ESTA
+function [ALLEEG, EEG, CURRENTSET, eliminados] = ...
+    eliminar_ruido(ALLEEG, EEG, CURRENTSET, noisy_epochs, sujeto, secs)
+
+arguments
+    ALLEEG
+    EEG
+    CURRENTSET
+    noisy_epochs
+    sujeto
+    secs (1,1) = false
+end
+% YA ELIMINA LO EVENTOS, AL PARECER SI NO SE ASIGNAN TODOS LOS DATOS QUE
+% DEBE EXPORTAR LA FUNCION, NO ELIMINA LOS DATOS. MODIFICA EL DATASET 
+% ACTUAL, FALTA SALVAR UNA COPIA DEL MISMO. NO SE SI DEBA GUARDAR LOS
+% EVENTOS CON EL NUMERO QUE SE SUPONE DEBERÍAN TENER O SI AL FINAL LA IDEA
+% SERA REETIQUETAR EN LA PSICOFISICA.
 
 eliminados = []; % Vector donde guardaremos los ID de las epocas eliminadas
 cancelado = false; % si se cancela toda la revisión
 
 fs = EEG.srate;
-t = (0:EEG.pnts-1)/fs; % Esto es para que grafique en segundos pero yo creo
-                       % que deberíamos poder cambiarlo. O directamente 
-                       % graficar en mumestras no segundos.
+if secs == true
+    t = (0:EEG.pnts-1)/fs;
+else
+    t = 1000*(0:EEG.pnts-1)/fs; % En mili - segundos es más intuitivo
+end
 
-for k = 1:numel(noisy_events)
+for k = 1:numel(noisy_epochs)
 
-    ep = noisy_events(k);
+    ep = noisy_epochs(k);
 
     % ----- GRAFICADO DE LA EPOCA SOSPECHOSA (UNICAMENTE) -----
     figure(100);
@@ -33,7 +45,7 @@ for k = 1:numel(noisy_events)
     ylabel('Canales');
     title(sprintf( ...
         'Sujeto %s — época sospechosa %d (%d/%d)', ...
-        sujeto, ep, k, numel(noisy_events)));
+        sujeto, ep, k, numel(noisy_epochs)));
 
     xlim([t(1) t(end)]);
     grid on;
@@ -75,26 +87,28 @@ if ~isempty(eliminados)
     rej = false(1,EEG.trials);
     rej(eliminados) = true;
 
-    EEG = pop_rejepoch(EEG,rej,0);
+    EEG = pop_rejepoch(EEG,rej,0); % Dataset a eliminar, eliminados, mostrar confirmacion, 0 = no
 
-    % ----- Log -----
-    sujeto_col = repmat(string(sujeto),numel(eliminados),1);
-
-    T = table( ...
-        sujeto_col, ...
-        eliminados(:), ...
-        'VariableNames',{'Sujeto','Epoca'});
-
-    logFile = fullfile('logs','epocas_eliminadas.csv');
-
-    if ~exist('logs','dir')
-        mkdir('logs');
-    end
-
-    if isfile(logFile)
-        writetable(T,logFile,'WriteMode','append');
-    else
-        writetable(T,logFile);
-    end
+    % % ----- Log -----
+    % sujeto_col = repmat(string(sujeto),numel(eliminados),1);
+    % 
+    % T = table( ...
+    %     sujeto_col, ...
+    %     eliminados(:), ...
+    %     'VariableNames',{'Sujeto','Epoca'});
+    % 
+    % logFile = fullfile('logs','epocas_eliminadas.csv');
+    % 
+    % if ~exist('logs','dir')
+    %     mkdir('logs');
+    % end
+    % 
+    % if isfile(logFile)
+    %     writetable(T,logFile,'WriteMode','append');
+    % else
+    %     writetable(T,logFile);
+    % end
 end
+% Sincronizacion. Con esto se confirma la modificacion, en principio.
+[ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG,EEG,CURRENTSET);
 end

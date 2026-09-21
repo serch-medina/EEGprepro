@@ -1,4 +1,4 @@
-function [ALLEEG EEG CURRENTSET ALLCOM] = cargar_datos_ICA(nombre_sujeto,fpath_act,fpath_evnt,fpath_loc,ptos_registro,ALLEEG,EEG,CURRENTSET,ALLCOM,unidad,campos_eventos,srate,nbchan)
+function [ALLEEG, EEG, CURRENTSET, ALLCOM] = cargar_datos_ICA(nombre_sujeto,fpath_act,fpath_evnt,fpath_loc,ptos_registro,ALLEEG,EEG,CURRENTSET,ALLCOM,unidad,campos_eventos,srate,nbchan)
 
     % Espera en fpath_sujeto la ruta completa del archivo donde se guarda 
     % la información de actividad del sujeto.
@@ -27,7 +27,7 @@ function [ALLEEG EEG CURRENTSET ALLCOM] = cargar_datos_ICA(nombre_sujeto,fpath_a
     
     nombre_dataset = [nombre_sujeto,'_prepropython'];
     EEG = pop_importdata('dataformat','ascii','nbchan',nbchan,'data',fullfile(fpath_act),'setname',nombre_dataset,'srate',srate,'pnts',ptos_registro,'xmin',0,'chanlocs',fullfile(fpath_loc));
-    [ALLEEG EEG CURRENTSET] = pop_newset(ALLEEG, EEG, 0,'gui','off'); 
+    [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0,'gui','off'); 
     EEG = pop_importevent( EEG,'append','no', 'event',fullfile(fpath_evnt),'fields',campos_eventos,'skipline',1,'timeunit',unidad); %timeunit indica 1 = 1 segundo, NaN = samples
     
     % Reescribimos los datos que ya teniamos

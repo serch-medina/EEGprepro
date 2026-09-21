@@ -23,4 +23,4 @@ py.extraer_datos.extraer_datos(false, true, false) % Yo guarde en el registro_de
 
 disp('¡Primer paso del preprocesamiento obliterado, finiquitado, machacado y pulverizado!');
 
-% clear ?
+clear srcDir regex files 
