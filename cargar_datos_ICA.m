@@ -1,4 +1,5 @@
-function [ALLEEG, EEG, CURRENTSET, ALLCOM] = cargar_datos_ICA(nombre_sujeto,fpath_act,fpath_evnt,fpath_loc,ptos_registro,ALLEEG,EEG,CURRENTSET,ALLCOM,unidad,campos_eventos,srate,nbchan)
+function [ALLEEG, EEG, CURRENTSET, ALLCOM] = ...
+    cargar_datos_ICA(nombre_sujeto,fpath_act,fpath_evnt,fpath_loc,ptos_registro,ALLEEG,EEG,CURRENTSET,ALLCOM,unidad,campos_eventos,srate,nbchan)
 
     % Espera en fpath_sujeto la ruta completa del archivo donde se guarda 
     % la información de actividad del sujeto.
