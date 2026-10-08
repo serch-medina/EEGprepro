@@ -52,10 +52,10 @@ datos_exportados_m/
 datos_exportados_py/
 figuras/
 resgistros/
-ensayos_por_eliminar/
+ens_por_eliminar/
 
 #Ignoramos los notebooks
 *.ipynb
 
-#Ignoramos segmentados de momento
+#Ignoramos segmentados
 segmentado/*

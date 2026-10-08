@@ -27,7 +27,7 @@ def extraer_datos(recortar = False, forzar_procesamiento = False, verificar_dura
         os.makedirs(ruta_filtrados)
         os.makedirs(ruta_modificados)
     # Crea el directorio donde se exportaran los ensayos a eliminar en formato .csv
-    ruta_csv = src_padre / 'ensayos_por_eliminar'
+    ruta_csv = src_padre / 'ens_por_eliminar'
     if not ruta_csv.is_dir():
         os.makedirs(ruta_csv)
 

@@ -18,7 +18,7 @@ end
 % La idea si seria guardar con el numero que deberían tener.
 
 eliminados = []; % Vector donde guardaremos los ID de las epocas eliminadas
-cancelado = false; % si se cancela toda la revisión
+% cancelado = false; % si se cancela toda la revisión
 
 fs = EEG.srate;
 if secs == true
@@ -35,33 +35,35 @@ for k = 1:numel(noisy_epochs)
     % ----- GRAFICADO DE LA EPOCA SOSPECHOSA (UNICAMENTE) -----
     figure(100);
     clf;
-
-    datos = squeeze(double(EEG.data(:,:,ep))); % SQUEEZE APACHURRA DIMENSIONES INNECESARIAS.
+    % fig = uifigure('Name', 'Visualizador de Datos');
+   
+    datos = squeeze(double(EEG.data(:,:,ep))); % SQUEEZE APACHURRA 
+                                               % DIMENSIONES INNECESARIAS.
 
     % Es para configurar la separación vertical entre canales. Se grafican
     % TODOS
     escala = max(std(datos,0,2))*5;
     % Operador ' (comilla):
     %-> Transpuesta conjugada
-    offsets = (0:EEG.nbchan-1)' * escala; 
-
+    noc = EEG.nbchan; % number of channels
+    offsets = (0:noc-1)' * escala; 
+    
+    % Personalizacion del color
+    grises = linspace(0, 0.6, noc)'; 
+    mapa_grises = [grises, grises, grises]; % Matriz de 32xn
+    
+    ax = gca; % 1. Obtenemos el objeto de los ejes actuales
+    ax.NextPlot = 'replacechildren';
+    ax.ColorOrder = mapa_grises; 
+    
     plot(t, gain*datos' + offsets');
     if secs
         xlabel('Tiempo (s)');
     else
         xlabel('Tiempo (ms)');
     end
-    
-    % === Dibujo de lineas de eventos. ===
-    % x0 = EEG.epoch(ep).eventlatency(1); 
-    % x0 = x0{1}; % Accedemos a posicion en arreglo
-    % tag0 = EEG.epoch(ep).eventtype(1); 
-    % tag0 = tag0{1}; % Accedemos a tipo de evento
-    % xline(x0, '--r', tag0, 'LabelVerticalAlignment', 'top')
 
-    % Copilot, agrega lineas verticales y de distinto color para el resto
-    % de evento y agrega algo de espacio antes y después de las gráficas
-    % === Dibujar eventos restantes con colores alternos ===
+    % === Marcar posiciones de eventos registrados en el EEG con colores ===
     eventLatencies = EEG.epoch(ep).eventlatency;
     eventTypes = EEG.epoch(ep).eventtype;
     for evIndx = 1:numel(eventLatencies)
@@ -84,11 +86,19 @@ for k = 1:numel(noisy_epochs)
         sujeto, ep, k, numel(noisy_epochs)));
 
     xlim([t(1)-pad t(end)+pad]);
-    grid on;
+    grid('on');
 
     drawnow;
 
     % ----- VENTANA GRAFICA DE SELECCIÓN -----
+    
+    % msg = sprintf("¿Qué hacer con el ruido de la época? %d", ep);
+    % title_name = "Revisión de ruido";
+    % 
+    % respuesta = uiconfirm(fig, msg, title_name, ...
+    %     Options = ["Eliminar", "Conservar", "Cancelar"], ...
+    %     DefaultOption = 2,CancelOption = 3);
+
     respuesta = questdlg( ...
         sprintf('¿Qué hacer con la época %d?',ep), ...
         'Revisión de ruido', ...
@@ -97,27 +107,28 @@ for k = 1:numel(noisy_epochs)
 
     switch respuesta
 
-        case 'Eliminar'
+        case "Eliminar"
             eliminados(end+1) = ep; % NO SE PUEDE PREALOCAR, NO SABEMOS NUMERO DE ELMINADOS DE ANTEMANO
 
-        case 'Conservar'
+        case "Conservar"
             % No hacemos nada
 
-        case {'Cancelar',''}
-            cancelado = true;
+        case {"Cancelar",''}
+            % cancelado = true;
             close(100);
             fprintf('Revisión cancelada. No se eliminó ninguna época.\n');
+            return;
+        otherwise
+            % cancelado = true;
+            close(100);
+            fprintf("Ninguna operación seleccionada. Cancelando")
             return;
     end
 end
 
 close(100);
 
-% CREO QUE SERIA MEJOR DEJAR ESTA COMO UNA FUNCION AL FINAL
-% ASI SE PODRIA LLAMAR SIN LA INTERFAZ GRAFICA Y PODRIA IMPLEMENTAR MI
-% ALGORITMO DE CALCULO DE INDICES PERSONALIZADO. (O SI EL LOG DEL PREPRO
-% ESTA VACIO, SOLO APLICAR LA ELIMINACION DIRECTA. 
-% ----- Aplicar TODAS las eliminaciones al final -----
+% ----- TODAS las eliminaciones se aplican al final -----
 if ~isempty(eliminados)
 
     rej = false(1,EEG.trials);
@@ -129,7 +140,7 @@ if ~isempty(eliminados)
                              % set de datos
     [ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
     
-    register_folder = 'ensayos_por_eliminar';
+    register_folder = 'ens_por_eliminar';
     register_file = [sujeto '_eventos_eliminados.csv'];
     
     % ==== Modificacion de los registros a eliminar en la psicofisica ====
