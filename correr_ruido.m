@@ -24,5 +24,6 @@ sujeto = sujeto{1};
 EEG = pop_loadset(file,dpath);
 eeglab redraw
 % Se detectan los eventos potencialmente ruidosos
-[ALLEEG, EEG,CURRENTSET, noisy_epochs] = detectar_ruido(ALLEEG,EEG,CURRENTSET);
-eliminar_ruido(ALLEEG, EEG,CURRENTSET, noisy_epochs,sujeto,20);
+[ALLEEG, EEG, CURRENTSET, noisy_epochs] = detectar_ruido(ALLEEG,EEG,CURRENTSET);
+[ALLEEG, EEG, CURRENTSET, true_noisy_epochs] = eliminar_ruido(ALLEEG, EEG,CURRENTSET, noisy_epochs,sujeto,20);
+eeglab redraw

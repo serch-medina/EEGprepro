@@ -23,18 +23,18 @@ function actualizar_registro(register_folder,register_file, ...
     end
     % 1. Define la ruta de tu archivo CSV
     register_path = fullfile(register_folder,register_file);
-    % Agregar los eventos
-    uncompleted_epochs = readtable(register_path);
-    uncompleted_epochs = uncompleted_epochs.Variables;
 
     if ~isfile(register_path)
+        
         % Lo volvemos vertical si es horizontal
         if size(new_elim_epochs,1) == 1
             new_elim_epochs = new_elim_epochs';
         end
         writematrix(new_elim_epochs, register_path);
     else
-        % Error si el archivo de registro no existe
+        % Agregar los eventos
+        uncompleted_epochs = readtable(register_path);
+        uncompleted_epochs = uncompleted_epochs.Variables;
         og_range = 1:og_num_epochs;
         % Trabajamos todo en horizontal.
         if size(uncompleted_epochs, 2) == 1

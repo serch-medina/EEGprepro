@@ -1,5 +1,27 @@
 function [ALLEEG, EEG, CURRENTSET, eliminados] = ...
-    eliminar_ruido(ALLEEG, EEG, CURRENTSET, noisy_epochs, sujeto, gain,secs)
+    eliminar_ruido(ALLEEG, EEG, CURRENTSET, noisy_epochs, sujeto, gain,secs,del_direct)
+%ELIMINAR_RUIDO - Revisa épocas ruidosas y elimina las seleccionadas
+%
+% Input arguments:
+%   ALLEEG      - conjuntos EEG acumulado de EEGLAB
+%   EEG         - dataset EEG actual
+%   CURRENTSET   - índice del dataset actual
+%   noisy_epochs - índices de épocas sospechosas
+%   sujeto      - identificador del sujeto
+%   gain        - ganancia para escalar la visualización
+%   secs        - usa segundos en vez de milisegundos
+%   del_direct  - si es 'true': elimina directamente las épocas indicadas
+%
+% Output arguments:
+%   ALLEEG      - conjuntos EEG actualizados
+%   EEG         - dataset EEG actualizado
+%   CURRENTSET  - índice actualizado del dataset
+%   eliminados  - épocas finalmente eliminadas
+% Funcion encargada de mostrar la interfaz grafica para seleccionar eventos
+% potencialmente ruidosos.
+% BUG: NO SE DEBE SELECCIONAR CON LA TECLA TABULADOR, DE LO CONTRARIO LA
+% OPCION SELECCIONADA SERA DISTINTA A LA DESEADA. ERROR proveniente de
+% questdlg
 
 arguments
     ALLEEG
@@ -9,17 +31,31 @@ arguments
     sujeto
     gain (1,1) = 7.5 % ganancia para aumentar escala de canales
     secs (1,1) = false
+    del_direct = false % Option used to directly delete a serie of events
 end
-% YA ELIMINA LO EVENTOS, AL PARECER SI NO SE ASIGNAN TODOS LOS DATOS QUE
-% DEBE EXPORTAR LA FUNCION, NO ELIMINA LOS DATOS. MODIFICA EL DATASET 
-% ACTUAL, FALTA SALVAR UNA COPIA DEL MISMO. NO SE SI DEBA GUARDAR LOS
-% EVENTOS CON EL NUMERO QUE SE SUPONE DEBERÍAN TENER O SI AL FINAL LA IDEA
-% SERA REETIQUETAR EN LA PSICOFISICA. 
-% La idea si seria guardar con el numero que deberían tener.
+
+% Omitir revisión interactiva si la eliminación es directa
+if del_direct
+    rej = false(1,EEG.trials);
+    rej(noisy_epochs) = true;
+
+    EEG = pop_rejepoch(EEG,rej,0); % Dataset a eliminar, eliminados, 
+    % mostrar confirmacion, 0 = no
+    EEG = eeg_checkset(EEG); % Nos cercioramos de la integridad del 
+    % set de datos
+    [ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
+
+    register_folder = 'ens_por_eliminar';
+    register_file = [sujeto '_eventos_eliminados.csv'];
+
+    % ==== Modificacion de los registros a eliminar en la psicofisica ====
+    actualizar_registro(register_folder,register_file,eliminados,198);
+end
 
 eliminados = []; % Vector donde guardaremos los ID de las epocas eliminadas
 % cancelado = false; % si se cancela toda la revisión
 
+% Preparar eje temporal según la unidad solicitada
 fs = EEG.srate;
 if secs == true
     t = (0:EEG.pnts-1)/fs;
@@ -27,6 +63,7 @@ else
     t = 1000*(0:EEG.pnts-1)/fs; % En mili - segundos es más intuitivo
 end
 
+% Revisar cada época marcada como ruidosa
 for k = 1:numel(noisy_epochs)
     
     % Epoch number
@@ -35,7 +72,6 @@ for k = 1:numel(noisy_epochs)
     % ----- GRAFICADO DE LA EPOCA SOSPECHOSA (UNICAMENTE) -----
     figure(100);
     clf;
-    % fig = uifigure('Name', 'Visualizador de Datos');
    
     datos = squeeze(double(EEG.data(:,:,ep))); % SQUEEZE APACHURRA 
                                                % DIMENSIONES INNECESARIAS.
@@ -91,44 +127,37 @@ for k = 1:numel(noisy_epochs)
     drawnow;
 
     % ----- VENTANA GRAFICA DE SELECCIÓN -----
-    
-    % msg = sprintf("¿Qué hacer con el ruido de la época? %d", ep);
-    % title_name = "Revisión de ruido";
-    % 
-    % respuesta = uiconfirm(fig, msg, title_name, ...
-    %     Options = ["Eliminar", "Conservar", "Cancelar"], ...
-    %     DefaultOption = 2,CancelOption = 3);
-
+   
     respuesta = questdlg( ...
         sprintf('¿Qué hacer con la época %d?',ep), ...
         'Revisión de ruido', ...
         'Eliminar','Conservar','Cancelar', ...
-        'Conservar');
-
+        'Eliminar');
+        disp(respuesta);
     switch respuesta
-
-        case "Eliminar"
+        case 'Eliminar'
             eliminados(end+1) = ep; % NO SE PUEDE PREALOCAR, NO SABEMOS NUMERO DE ELMINADOS DE ANTEMANO
-
-        case "Conservar"
+            disp(eliminados);
+        case 'Conservar'
             % No hacemos nada
-
-        case {"Cancelar",''}
+            continue;
+        case {'Cancelar',''}
             % cancelado = true;
             close(100);
             fprintf('Revisión cancelada. No se eliminó ninguna época.\n');
             return;
-        otherwise
-            % cancelado = true;
-            close(100);
-            fprintf("Ninguna operación seleccionada. Cancelando")
-            return;
+        % otherwise
+        % %     cancelado = true;
+        %     close(100);
+        %     fprintf("Ninguna operación seleccionada. Cancelando")
+        %     return;
     end
 end
 
 close(100);
 
-% ----- TODAS las eliminaciones se aplican al final -----
+% Aplicar todas las eliminaciones acumuladas al finalizar la revisión
+disp(eliminados)
 if ~isempty(eliminados)
 
     rej = false(1,EEG.trials);
@@ -145,7 +174,4 @@ if ~isempty(eliminados)
     
     % ==== Modificacion de los registros a eliminar en la psicofisica ====
     actualizar_registro(register_folder,register_file,eliminados,198);
-
-% Sincronizacion. Con esto se confirma la modificacion, en principio.
-[ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG,EEG,CURRENTSET);
 end
