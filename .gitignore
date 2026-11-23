@@ -45,17 +45,22 @@ eeglab2026/
 eeglab2026.0.0/
 
 ## Carpetas del proyecto y otros programas
-__pycache__/*
+__pycache__/
 
 # Ignorar carpetas de exportado de datos. Solo nos interesan los scripts
+# Para incluir solo la carpeta data/ se agrego un .gitignore dentro
 datos_exportados_m/
 datos_exportados_py/
 figuras/
-resgistros/
+registros/
 ens_por_eliminar/
+# Todos los datos que deben ser modificados por alguna razón
+datos_varios/
+#Ignoramos segmentados
+segmentado/*
 
 #Ignoramos los notebooks
 *.ipynb
 
-#Ignoramos segmentados
-segmentado/*
+# Otros
+visualizar_compo.m

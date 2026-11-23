@@ -1,11 +1,24 @@
 function actualizar_registro(register_folder,register_file, ...
         new_elim_epochs,og_num_epochs)
+    %ACTUALIZAR_REGISTRO - Actualiza el registro de ensayos eliminados,
+    % agregando los que se eliminen en la deteccion semiautomatica de ruido
+    %
+    % Input arguments:
+    %   register_folder - carpeta donde se guarda el registro
+    %   register_file   - nombre del archivo de registro
+    %   new_elim_epochs  - índices nuevos de ensayos eliminados
+    %   og_num_epochs    - número original de ensayos
+    %
+    % Output arguments:
+    %   Ninguno
+    %
     arguments
         register_folder (1,:) char;
         register_file (1,:) char;
         new_elim_epochs;
         og_num_epochs (1,1);
     end
+    % Preparar validaciones y mapeo entre numeración original y nueva
     % Generar un vector que nos de la correspondencia de la numeracion
     % original con la nueva, pasar los eventos eliminados en la numeracion
     % nueva a la original con la correspondencia y listo.
@@ -16,22 +29,26 @@ function actualizar_registro(register_folder,register_file, ...
     if any(new_elim_epochs < 1 | new_elim_epochs > og_num_epochs)
         error('Los eventos eliminados contienen índices no válidos.');
     end
+    % Salir sin cambios cuando no hay ensayos nuevos para registrar
     % Si no hay ensayos eliminados
     if isempty(new_elim_epochs)
         disp("Ningun ensayo fue eliminado. Registros inalterados.")
         return % Interrumpimos la ejecucion
     end
+    % Construir la ruta del archivo de registro
     % 1. Define la ruta de tu archivo CSV
     register_path = fullfile(register_folder,register_file);
 
     if ~isfile(register_path)
         
+        % Guardar directamente si el archivo aún no existe
         % Lo volvemos vertical si es horizontal
         if size(new_elim_epochs,1) == 1
             new_elim_epochs = new_elim_epochs';
         end
         writematrix(new_elim_epochs, register_path);
     else
+        % Cargar el historial previo y normalizar su forma
         % Agregar los eventos
         uncompleted_epochs = readtable(register_path);
         uncompleted_epochs = uncompleted_epochs.Variables;
@@ -42,6 +59,7 @@ function actualizar_registro(register_folder,register_file, ...
                 uncompleted_epochs.'; % Lo transponemos a horizontal si es 
                                       % vertical
         end
+        % Partir del registro previo antes de añadir los nuevos índices
         updated_deleted_ep = ...
             uncompleted_epochs; %MATLAB crea una copia pues se modificara 
                                 % updated_elim_ep
@@ -55,3 +73,4 @@ function actualizar_registro(register_folder,register_file, ...
         disp("Registro actualizado correctamente.")
     end
 end
+

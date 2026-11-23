@@ -109,19 +109,15 @@ for k = 1:numel(noisy_epochs)
         xline(eventLatency, '--', eventType, ...
             'Color', [(1-s*evIndx),s*(evIndx-1),0.5], 'LabelVerticalAlignment', 'top');
     end
-    
-    pad = 300; % Espacio extra en los ejes
-    xlim([t(1)-pad t(end)+pad]);
-    axis tight;
-    padding = 0.03 * diff(xlim);
-    xlim([t(1)-pad t(end)+pad]);
 
     ylabel(sprintf('Canales [%.2e V]',(1e-6)/gain));
     title(sprintf( ...
         'Sujeto %s — época sospechosa %d (%d/%d)', ...
         sujeto, ep, k, numel(noisy_epochs)));
 
-    xlim([t(1)-pad t(end)+pad]);
+    pad = 300; % Espacio extra en los ejes
+    axis tight; % establece los limites a los datos (en x;y)
+    xlim([t(1)-pad t(end)+pad]); %  cambiamos los limites de x.
     grid('on');
 
     drawnow;

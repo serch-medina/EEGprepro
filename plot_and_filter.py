@@ -338,7 +338,7 @@ def exportar_actividad(datafiltrada, nombre):
 # *-------------------------------- Filtros --------------------------------
 
 def butter_bandpass(lowcut:float, highcut:float, fs:float, order=4):
-    """Construye un filtro pasabanda Butterworth.
+    """Construye un filtro pasabanda Butterworth, calculando los coeficientes del filtro 
 
     Parametros
     ----------
@@ -354,9 +354,9 @@ def butter_bandpass(lowcut:float, highcut:float, fs:float, order=4):
     Regresa
     ----------
     tuple
-        Coeficientes del filtro Butterworth.
+        Coeficientes del filtro Butterworth, en orden 'b' y 'a'.
     """
-    return butter(order, [lowcut, highcut], fs=fs, btype='band',output='ba')
+    return butter(order, [lowcut, highcut], fs=fs, btype='band',output='ba') # Es un tipo de filtro IIR
 
 def butter_bandpass_filter(data, lowcut, highcut, fs, order=4):
     """Aplica un filtro pasabanda a una señal.
@@ -379,8 +379,8 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=4):
     np.ndarray
         Señal filtrada.
     """
-    b, a = butter_bandpass(lowcut, highcut, fs, order=order)
-    y = lfilter(b, a, data)
+    b, a = butter_bandpass(lowcut, highcut, fs, order=order) # Calcula coeficientes del filtro Butterworth
+    y = lfilter(b, a, data) # Aplica el filtro a la señal usando lfilter (filtrado causal). Induce retardo de fase.
     #y = filtfilt(b, a, data)
     return y
 
@@ -414,7 +414,7 @@ def filtrado_butterworth(actividad, fs=250, lowcut=0.5, highcut=50, lenChannels 
         filtered.append(butter_bandpass_filter(SignF[i, :], lowcut, highcut, fs, order = orden)) #entre 3 y 5 order
 
     DataFiltBP = np.array(filtered)
-    print(np.shape(DataFiltBP)) # El shape debe ser (num electrodos, tiempo)
+    print(np.shape(DataFiltBP)) # El shape debe ser (num electrodos, num muestras)
     return DataFiltBP    
 
 # *-------------------------------- Graficación --------------------------------

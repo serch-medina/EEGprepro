@@ -1,6 +1,6 @@
 function config_files()
     % Funcion que asocia eventos con la salida de un canal, se
-    % cersiora de que exista el numero correcto de canales, en este caso 33,
+    % cerciora de que exista el numero correcto de canales, en este caso 33,
     % carga el archivo de localizaciones de los electrodos y renombra los
     % eventos para que el indice de estos coincida con el esperado por el archivo
     % python. Elimina la parte ruidosa del incio del registro y exporta dos 
@@ -60,7 +60,7 @@ function config_files()
             EEG = pop_select(EEG, 'rmchannel', [33 34 35]);
     
         elseif num_canales == 33
-            fprintf('Detectado caso de 33 canales. Se conservan 32 de EEG y el canal 33 como eventos.\n');
+            fprintf('Detectado caso de 33 canales. Se conservan 32 de EEG y se toma el canal 33 como eventos.\n');
             % CASO 33 CANALES:
             EEG = pop_chanevent(EEG,33,'edge','leading','delevent','on','delchan','on');
     
@@ -90,19 +90,18 @@ function config_files()
         [ALLEEG, EEG, CURRENTSET] = pop_newset(ALLEEG, EEG, 0, 'setname', nmbre, 'gui', 'off');
     
         % CARGA DE LOCALIZACIONES DE LOS ELECTRODOS 
-        % ==== o sera con get_chanlocs? ====
         EEG = pop_editset(EEG,'chanlocs', ruta_acanales);
         fprintf('Carga de archivos de canales completada \n')
     
         % ELIMINACION DE LOS PRIMEROS SEGUNDOS DEL REGISTRO
         marca_evento = EEG.event(1).latency; % Da la latencia (tiempo) del primer 
-        % evento, en unidades de muestras
+                                             % evento, en unidades de muestras
         segundos = 2; % Cantidad de segundos que quedan antes del 1er evento
         puntos = segundos*EEG.srate; % Cantidad de puntos a conservar " "
         punto_corte = max(round(marca_evento/2),round(marca_evento-puntos)); % Toma el maximo entre la mitad del intervalo de tiempo transcurrido desde el inicio del registro y el intervalo completo menos dos segundos
         region_elim = [1,punto_corte];
         EEG = eeg_eegrej(EEG,region_elim);
-    
+
         % CORTAMOS EL EVENTO BOUNDARY
         EEG.event(1) = [];
         EEG = eeg_checkset(EEG);

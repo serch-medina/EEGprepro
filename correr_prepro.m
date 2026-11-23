@@ -1,3 +1,7 @@
+% Función que configura la posición de los electrodos en el gorro de EEG y
+% se cerciora de que el numero de canales del registro sea el adecuado. Se
+% esperan registros con 32 canales, sin embargo, hay registros con mayor
+% cantidad.
 config_files
 
 % Carpeta fuente de los archivos .set y dft

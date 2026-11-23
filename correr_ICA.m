@@ -16,12 +16,12 @@ ptos_registro = extraer_puntos(fpath_registros,nombre_sujeto,recortado);
 eeglab redraw 
 EEG = pop_runica(EEG, 'icatype', 'fastica'); % ejecucion de ICA
 noc = size(EEG.icawinv, 2); % noc: number of ica components
-[ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
+[ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET); % Sobreescribe los datos del ICA en el dataset actual.
 eeglab redraw
-EEG = iclabel(EEG);
+EEG = iclabel(EEG, 'default'); % Por que puse la linea repetida dos veces, solo una es con la GUI? 
 EEG = pop_iclabel(EEG, 'default');
 [ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
 % - El segundo argumento es si se usan componentes (=0) o canales (=1) 
 % - El ultimo argumento es el gestor de componentes que se usara
-pop_viewprops(EEG, 0, [1:noc], {'freqrange', [2 80]}, {}, 1, 'ICLabel') 
+pop_viewprops(EEG, 0, 1:noc, {'freqrange', [2 80]}, {}, 1, 'ICLabel') 
 eeglab redraw
